@@ -16,6 +16,7 @@ import { Post } from './post/post.entity';
       synchronize: true,
       useUnifiedTopology: true,
       entities: [Author, Post],
+      logging: true,
     }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,

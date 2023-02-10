@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Post } from './post.entity';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { v4 as uuid } from 'uuid';
 import { CreatePostInput } from './input/create-post.input';
 
@@ -29,5 +29,13 @@ export class PostService {
 
   async getPost(id: string): Promise<Post> {
     return this.postRepository.findOne({ where: { id } });
+  }
+
+  async getAllPostWithIds(postIds: string[]): Promise<Post[]> {
+    return this.postRepository.find({
+      where: {
+        id: In(postIds),
+      },
+    });
   }
 }

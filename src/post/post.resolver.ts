@@ -8,17 +8,17 @@ export class PostResolver {
   constructor(private postService: PostService) {}
 
   @Query(() => [PostType])
-  posts() {
+  async posts() {
     return this.postService.getPosts();
   }
 
   @Query(() => PostType)
-  post(@Args('id') id: string) {
+  async post(@Args('id') id: string) {
     return this.postService.getPost(id);
   }
 
   @Mutation(() => PostType)
-  createPost(@Args('createPostInput') createPostInput: CreatePostInput) {
+  async createPost(@Args('createPostInput') createPostInput: CreatePostInput) {
     return this.postService.createPost(createPostInput);
   }
 }

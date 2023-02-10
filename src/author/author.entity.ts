@@ -13,4 +13,7 @@ export class Author {
 
   @Column()
   lastName: string;
+
+  @Column()
+  posts: string[];
 }
