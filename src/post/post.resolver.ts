@@ -1,7 +1,10 @@
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
-import { PostType } from './post.type';
 import { PostService } from './post.service';
+import { PostType } from './dto/post-type.dto';
 import { CreatePostInput } from './input/create-post.input';
+import { GetOnePostInput } from './input/get-one-post.input';
+import { UpdatePostInput } from './input/update-post.input';
+import { DeletePostInput } from './input/delete-post.input';
 
 @Resolver(() => PostType)
 export class PostResolver {
@@ -9,16 +12,28 @@ export class PostResolver {
 
   @Query(() => [PostType])
   async posts() {
-    return this.postService.getPosts();
-  }
-
-  @Query(() => PostType)
-  async post(@Args('id') id: string) {
-    return this.postService.getPost(id);
+    return this.postService.getAll();
   }
 
   @Mutation(() => PostType)
-  async createPost(@Args('createPostInput') createPostInput: CreatePostInput) {
-    return this.postService.createPost(createPostInput);
+  async createPost(@Args('createPostInput') input: CreatePostInput) {
+    return this.postService.create(input);
+  }
+
+  @Query(() => PostType, { nullable: true })
+  async post(@Args('post') input: GetOnePostInput) {
+    return this.postService.getOne(input);
+  }
+
+  @Mutation(() => PostType)
+  async updatePost(@Args('updatePostInput') input: UpdatePostInput) {
+    return this.postService.update(input);
+  }
+
+  @Mutation(() => Boolean)
+  async deletePost(@Args('deletePostInput') input: DeletePostInput) {
+    const res = await this.postService.delete(input);
+
+    return res.deletedCount > 0;
   }
 }

@@ -1,8 +1,11 @@
 import { Field, ID, InputType } from '@nestjs/graphql';
-import { IsUUID, MinLength } from 'class-validator';
+import { MinLength } from 'class-validator';
 
 @InputType()
-export class CreateAuthorInput {
+export class UpdateAuthorInput {
+  @Field(() => ID)
+  id: string;
+
   @MinLength(1)
   @Field()
   firstName: string;
@@ -11,7 +14,6 @@ export class CreateAuthorInput {
   @Field()
   lastName: string;
 
-  @IsUUID('4', { each: true })
   @Field(() => [ID], { defaultValue: [] })
-  postIds: string[];
+  posts: string[];
 }

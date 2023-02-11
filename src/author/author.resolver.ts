@@ -6,14 +6,14 @@ import {
   ResolveField,
   Resolver,
 } from '@nestjs/graphql';
-import { AuthorType } from './author.type';
 import { AuthorService } from './author.service';
-import { AddPostsInput } from './input/add-posts.input';
-import { CreateAuthorInput } from './input/create-author';
+import { CreateAuthorInput } from './input/create-author.input';
+import { AuthorType } from './dto/author-type.dto';
 import { PostService } from '../post/post.service';
-import { PostType } from '../post/post.type';
-import { Post } from '../post/post.entity';
-import { Author } from './author.entity';
+import { AddPostsInput } from './input/add-posts.input';
+import { GetOneAuthorInput } from './input/get-one-author.input';
+import { UpdateAuthorInput } from './input/update-author.input';
+import { DeleteAuthorInput } from './input/delete-author.input';
 
 @Resolver(() => AuthorType)
 export class AuthorResolver {
@@ -24,30 +24,40 @@ export class AuthorResolver {
 
   @Query(() => [AuthorType])
   async authors() {
-    return this.authorService.getAuthors();
-  }
-
-  @Query(() => AuthorType)
-  async author(@Args('id') id: string) {
-    return this.authorService.getAuthor(id);
+    return this.authorService.getAll();
   }
 
   @Mutation(() => AuthorType)
-  async createAuthor(
-    @Args('createAuthorInput') createAuthorInput: CreateAuthorInput,
-  ) {
-    return this.authorService.createAuthor(createAuthorInput);
+  async createAuthor(@Args('createAuthorInput') input: CreateAuthorInput) {
+    return this.authorService.create(input);
+  }
+
+  @Query(() => AuthorType, { nullable: true })
+  async author(@Args('author') input: GetOneAuthorInput) {
+    return this.authorService.getOne(input);
+  }
+
+  @Mutation(() => AuthorType)
+  async updateAuthor(@Args('updateAuthorInput') input: UpdateAuthorInput) {
+    return this.authorService.update(input);
+  }
+
+  @Mutation(() => Boolean)
+  async deleteAuthor(@Args('deleteAuthorInput') input: DeleteAuthorInput) {
+    const res = await this.authorService.delete(input);
+
+    return res.deletedCount > 0;
   }
 
   @Mutation(() => AuthorType)
   async addPosts(@Args('addPostsInput') addPostsInput: AddPostsInput) {
-    const { authorId, postIds } = addPostsInput;
+    const { authorId, posts } = addPostsInput;
 
-    return this.authorService.addPosts(authorId, postIds);
+    return this.authorService.addPosts(authorId, posts);
   }
 
   @ResolveField('posts')
-  async posts(@Parent() author: Author) {
+  async posts(@Parent() author: AuthorType) {
     return this.postService.getAllPostWithIds(author.posts);
   }
 }

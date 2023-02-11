@@ -2,27 +2,30 @@ import { Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { AuthorModule } from './author/author.module';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { Author } from './author/author.entity';
 import { PostModule } from './post/post.module';
-import { Post } from './post/post.entity';
+import { MongooseModule } from '@nestjs/mongoose';
+import { GraphQLError } from 'graphql/error';
 
 @Module({
   imports: [
-    // MongooseModule.forRoot('mongodb://localhost/nestjs-graphql'),
-    TypeOrmModule.forRoot({
-      type: 'mongodb',
-      url: 'mongodb://root:root@localhost:27017/test?authSource=admin',
-      synchronize: true,
-      useUnifiedTopology: true,
-      entities: [Author, Post],
-      logging: true,
-    }),
+    MongooseModule.forRoot(
+      'mongodb://root:root@localhost:27017/test?authSource=admin',
+    ),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       debug: true,
       playground: true,
       autoSchemaFile: true,
+      formatError: (error: GraphQLError) => {
+        return {
+          statusCode: (error as any)?.extensions?.response?.statusCode || 500,
+          code: error?.extensions?.code || 'INTERNAL_SERVER_ERROR',
+          message:
+            (error as any)?.extensions?.response?.error ||
+            'Internal Server Error',
+          errors: (error as any)?.extensions?.response?.message || [],
+        };
+      },
     }),
     AuthorModule,
     PostModule,

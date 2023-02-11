@@ -1,10 +1,7 @@
 import { Field, ID, InputType } from '@nestjs/graphql';
 
 @InputType()
-export class AddPostsInput {
+export class GetOneAuthorInput {
   @Field(() => ID)
-  authorId: string;
-
-  @Field(() => [ID])
-  posts: string[];
+  id: string;
 }
